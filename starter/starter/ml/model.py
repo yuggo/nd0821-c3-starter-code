@@ -1,4 +1,5 @@
 from sklearn.metrics import fbeta_score, precision_score, recall_score
+from sklearn.ensemble import GradientBoostingClassifier
 
 
 # Optional: implement hyperparameter tuning.
@@ -18,7 +19,28 @@ def train_model(X_train, y_train):
         Trained machine learning model.
     """
 
-    pass
+    parameters = {
+        "loss": ('log_loss', 'exponential'),
+        "learning_rate": (0.001, 0.01, 0.1),
+        "n_estimators": (100, 200),
+        "subsample": (0.8, 0.9, 1),
+        "max_depth": (3, 5)
+    }
+
+    model = GradientBoostingClassifier(random_state=0, max_features='auto')
+
+    boost_grid = GridSearchCV(
+        model, 
+        param_grid = parameters,
+        cv = 5, 
+        verbose = False)
+    
+    boost_grid_model = boost_grid.fit(X_train, y_train)
+
+    final_model = GradientBoostingClassifier(random_state=0, max_features='auto', **boost_grid_model.best_params_)
+    final_model.fit(X_train)
+
+    return final_model
 
 
 def compute_model_metrics(y, preds):
@@ -57,4 +79,4 @@ def inference(model, X):
     preds : np.array
         Predictions from the model.
     """
-    pass
+    return model.predict(X)
