@@ -4,7 +4,8 @@ from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
 
-from starter.ml.data import process_data
+# from starter.starter.ml.data import process_data
+
 
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
@@ -34,14 +35,18 @@ def train_model(X_train, y_train):
     model = GradientBoostingClassifier(random_state=0, max_features=1.0)
 
     boost_grid = GridSearchCV(
-        model, 
-        param_grid = parameters,
-        cv = 5, 
-        verbose = False)
-    
+        model,
+        param_grid=parameters,
+        cv=5,
+        verbose=False)
+
     boost_grid_model = boost_grid.fit(X_train, y_train)
 
-    final_model = GradientBoostingClassifier(random_state=0, max_features=1.0, **boost_grid_model.best_params_)
+    final_model = GradientBoostingClassifier(
+        random_state=0,
+        max_features=1.0,
+        **boost_grid_model.best_params_)
+
     final_model.fit(X_train, y_train)
 
     return final_model
@@ -49,7 +54,8 @@ def train_model(X_train, y_train):
 
 def compute_model_metrics(y, preds):
     """
-    Validates the trained machine learning model using precision, recall, and F1.
+    Validates the trained machine learning model using precision,
+    recall, and F1.
 
     Inputs
     ------
@@ -85,9 +91,12 @@ def inference(model, X):
     """
     return model.predict(X)
 
-def compute_model_metrics_per_slice(model, test, encoder, lb, cat_features, column):
+
+def compute_model_metrics_per_slice(model, test, X_test, y_test,
+                                    column):
     """
-    Validates the trained machine learning model using precision, recall, and F1.
+    Validates the trained machine learning model using precision,
+    recall, and F1.
 
     Inputs
     ------
@@ -95,11 +104,9 @@ def compute_model_metrics_per_slice(model, test, encoder, lb, cat_features, colu
         Trained machine learning model.
     test: DataFrame
         Data used for prediction.
-    encoder : np.array
+    X_test : np.array
         Predicted labels, binarized.
-    lb : np.array
-        Predicted labels, binarized.
-    cat_features : np.array
+    y_test : np.array
         Predicted labels, binarized.
     column : string
         Predicted labels, binarized.
@@ -114,16 +121,15 @@ def compute_model_metrics_per_slice(model, test, encoder, lb, cat_features, colu
     recall_list = []
     fbeta_list = []
 
+    predictions = inference(model, X_test)
+
     for slice in slices:
-        test_slice = test.loc[test[column]==slice]
+        mask = test[column] == slice
+        slice_y = y_test[mask]
+        slice_pred = predictions[mask]
 
-        X_test_slice, y_test_slice, _, _ = process_data(
-            test_slice, categorical_features=cat_features, label="salary", training=False,
-            encoder=encoder, lb=lb
-        )
-
-        pred_slice = inference(model, X_test_slice)
-        precision, recall, fbeta = compute_model_metrics(y_test_slice, pred_slice)
+        precision, recall, fbeta = compute_model_metrics(slice_y,
+                                                         slice_pred)
         precision_list.append(precision)
         recall_list.append(recall)
         fbeta_list.append(fbeta)

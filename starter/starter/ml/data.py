@@ -3,7 +3,8 @@ from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
 
 
 def process_data(
-    X, categorical_features=[], label=None, training=True, encoder=None, lb=None
+    X, categorical_features=[], label=None,
+    training=True, encoder=None, lb=None
 ):
     """ Process the data used in the machine learning pipeline.
 
@@ -41,7 +42,7 @@ def process_data(
         in.
     lb : sklearn.preprocessing._label.LabelBinarizer
         Trained LabelBinarizer if training is True, otherwise returns the binarizer
-        passed in.
+        passed in. # noqa: E501
     """
 
     if label is not None:
