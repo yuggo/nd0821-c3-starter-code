@@ -1,6 +1,10 @@
+import pandas as pd
+
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import GridSearchCV
 
+from starter.ml.data import process_data
 
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
@@ -27,7 +31,7 @@ def train_model(X_train, y_train):
         "max_depth": (3, 5)
     }
 
-    model = GradientBoostingClassifier(random_state=0, max_features='auto')
+    model = GradientBoostingClassifier(random_state=0, max_features=1.0)
 
     boost_grid = GridSearchCV(
         model, 
@@ -37,8 +41,8 @@ def train_model(X_train, y_train):
     
     boost_grid_model = boost_grid.fit(X_train, y_train)
 
-    final_model = GradientBoostingClassifier(random_state=0, max_features='auto', **boost_grid_model.best_params_)
-    final_model.fit(X_train)
+    final_model = GradientBoostingClassifier(random_state=0, max_features=1.0, **boost_grid_model.best_params_)
+    final_model.fit(X_train, y_train)
 
     return final_model
 
@@ -80,3 +84,53 @@ def inference(model, X):
         Predictions from the model.
     """
     return model.predict(X)
+
+def compute_model_metrics_per_slice(model, test, encoder, lb, cat_features, column):
+    """
+    Validates the trained machine learning model using precision, recall, and F1.
+
+    Inputs
+    ------
+    model : ???
+        Trained machine learning model.
+    test: DataFrame
+        Data used for prediction.
+    encoder : np.array
+        Predicted labels, binarized.
+    lb : np.array
+        Predicted labels, binarized.
+    cat_features : np.array
+        Predicted labels, binarized.
+    column : string
+        Predicted labels, binarized.
+    Returns
+    -------
+    result : Pandas DataFrame
+    """
+
+    slices = test[column].unique()
+
+    precision_list = []
+    recall_list = []
+    fbeta_list = []
+
+    for slice in slices:
+        test_slice = test.loc[test[column]==slice]
+
+        X_test_slice, y_test_slice, _, _ = process_data(
+            test_slice, categorical_features=cat_features, label="salary", training=False,
+            encoder=encoder, lb=lb
+        )
+
+        pred_slice = inference(model, X_test_slice)
+        precision, recall, fbeta = compute_model_metrics(y_test_slice, pred_slice)
+        precision_list.append(precision)
+        recall_list.append(recall)
+        fbeta_list.append(fbeta)
+
+        result = pd.DataFrame(
+            list(zip(slices, precision_list, recall_list, fbeta_list)),
+            columns=[column, 'precision', 'recall', 'fbeta']
+        )
+
+    return result
