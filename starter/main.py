@@ -27,6 +27,26 @@ if "DYNO" in os.environ and os.path.isdir(".dvc"):
     else:
         os.system("rm -r .dvc .apt/usr/lib/dvc")
 
+
+example = {
+        "age": 32,
+        "workclass": "State-gov",
+        "fnlgt": 0,
+        "education": "Bachelors",
+        "education_num": 13,
+        "marital_status": "Never-married",
+        "occupation": "Exec-managerial",
+        "relationship": "Own-child",
+        "race": "White",
+        "sex": "Female",
+        "capital_gain": 1000,
+        "capital_loss": 20,
+        "hours_per_week": 40,
+        "native_country": "United-States"
+    }
+
+example_full = {"example": example}
+
 app = FastAPI()
 
 
@@ -109,6 +129,9 @@ class PredictItem(BaseModel):
                             'Greece', 'Nicaragua', 'Vietnam',
                             'Hong', 'Ireland', 'Hungary',
                             'Holand-Netherlands']
+
+    class Config:
+        schema_extra = example_full
 
 
 PATH_TO_MODEL = "model.pkl"
