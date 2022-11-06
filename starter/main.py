@@ -28,8 +28,6 @@ if "DYNO" in os.environ and os.path.isdir(".dvc"):
         os.system("rm -r .dvc .apt/usr/lib/dvc")
 
 app = FastAPI()
-logging.warning(os.getcwd())
-logging.warning(os.listdir("data"))
 
 
 class PredictItem(BaseModel):
@@ -113,12 +111,12 @@ class PredictItem(BaseModel):
                             'Holand-Netherlands']
 
 
-PATH_TO_MODEL = "data/model.pkl"
+PATH_TO_MODEL = "model.pkl"
 
 with open(PATH_TO_MODEL, 'rb') as file:
     model = pickle.load(file)
 
-PATH_TO_ENCODER = "data/encoder.pkl"
+PATH_TO_ENCODER = "encoder.pkl"
 
 with open(PATH_TO_ENCODER, 'rb') as file:
     encoder = pickle.load(file)
