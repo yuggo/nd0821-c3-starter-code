@@ -29,6 +29,7 @@ if "DYNO" in os.environ and os.path.isdir(".dvc"):
 
 app = FastAPI()
 logging.warning(os.getcwd())
+logging.warning(os.listdir("data"))
 
 
 class PredictItem(BaseModel):
