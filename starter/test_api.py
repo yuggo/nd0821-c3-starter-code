@@ -8,7 +8,7 @@ client = TestClient(app)
 def test_locally_get_root():
     r = client.get("/")
     assert r.status_code == 200
-    assert r.json == "Hello World"
+    assert r.json() == "Hello World"
 
 
 def test_locally_post_poor():
