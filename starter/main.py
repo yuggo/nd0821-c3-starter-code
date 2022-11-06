@@ -12,6 +12,7 @@ import pandas as pd
 
 import os
 import subprocess
+import logging
 
 
 if "DYNO" in os.environ and os.path.isdir(".dvc"):
@@ -26,7 +27,7 @@ if "DYNO" in os.environ and os.path.isdir(".dvc"):
         os.system("rm -r .dvc .apt/usr/lib/dvc")
 
 app = FastAPI()
-
+logging.warning(os.getcwd())
 
 class PredictItem(BaseModel):
     age: int
