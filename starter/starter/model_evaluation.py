@@ -7,8 +7,7 @@ from sklearn.model_selection import train_test_split
 
 # Add the necessary imports for the starter code.
 from ml.data import process_data
-from ml.model import train_model, compute_model_metrics_per_slice, \
-                     inference, compute_model_metrics
+from ml.model import inference, compute_model_metrics
 
 # Add Path to Data
 PATH_TO_FILE = "../data/census.csv"
@@ -42,8 +41,9 @@ X_test, y_test, _, _ = process_data(
     encoder=encoder, lb=lb
 )
 
-# Train and save a model.
-model = train_model(X_train, y_train)
+PATH_TO_MODEL = "../data/model.pkl"
+with open(PATH_TO_MODEL, 'rb') as file:
+    model = pickle.load(file)
 
 predictions = inference(model, X_test)
 precision, recall, fbeta = compute_model_metrics(
@@ -53,15 +53,3 @@ precision, recall, fbeta = compute_model_metrics(
 print(precision)
 print(recall)
 print(fbeta)
-
-PATH_TO_MODEL = "../data/model.pkl"
-with open(PATH_TO_MODEL, 'wb') as file:
-    pickle.dump(model, file)
-
-per_slice = compute_model_metrics_per_slice(
-    model, test, X_test, y_test, 'education'
-)
-
-OUTPUT_SLICE_PATH = "../data/slice_output.txt"
-
-per_slice.to_csv(OUTPUT_SLICE_PATH, index=False, float_format='%.3f')
