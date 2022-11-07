@@ -41,9 +41,12 @@ X_test, y_test, _, _ = process_data(
     encoder=encoder, lb=lb
 )
 
+# Train and save a model.
+model = train_model(X_train, y_train)
+
 PATH_TO_MODEL = "../data/model.pkl"
-with open(PATH_TO_MODEL, 'rb') as file:
-    model = pickle.load(file)
+with open(PATH_TO_MODEL, 'wb') as file:
+    pickle.dump(model, file)
 
 per_slice = compute_model_metrics_per_slice(
     model, test, X_test, y_test, 'education'
@@ -52,12 +55,3 @@ per_slice = compute_model_metrics_per_slice(
 OUTPUT_SLICE_PATH = "../data/slice_output.txt"
 
 per_slice.to_csv(OUTPUT_SLICE_PATH, index=False, float_format='%.3f')
-
-exit()
-
-# Train and save a model.
-model = train_model(X_train, y_train)
-
-PATH_TO_MODEL = "../data/model.pkl"
-with open(PATH_TO_MODEL, 'wb') as file:
-    pickle.dump(model, file)
